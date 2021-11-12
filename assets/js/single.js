@@ -8,6 +8,9 @@ var getRepoIssues = function (repo) {
     if (response.ok) {
       response.json().then(function(data) {
       displayIssues(data);
+      if (response.headers.get("Link")) {
+          console.log("repo has more than 30 issues");
+      }
     });
 } else {
       alert("There was a problem with your request");
@@ -19,6 +22,7 @@ getRepoIssues("facebook/react");
 
 
 var displayIssues = function(issues) {
+    console.log(issues);
  if (issues.length === 0) {
      issueContainerEl.textContent = "This repo has no open issues!";
      return;
