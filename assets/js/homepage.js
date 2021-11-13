@@ -3,6 +3,7 @@ var userFormEl = document.querySelector("#user-form");
 var nameInputEl = document.querySelector("#username");
 var repoContainerEl = document.querySelector("#repos-container");
 var repoSearchTerm = document.querySelector("#repo-search-term");
+var languageButtonsEl = document.querySelector("#language-buttons");
 
 //Get repositories from API
 var getUserRepos = function (user) {
@@ -10,20 +11,21 @@ var getUserRepos = function (user) {
   var apiUrl = "https://api.github.com/users/" + user + "/repos";
 
   //Make a request to the url
-  fetch(apiUrl).then(function (response) {
-    //Request was successful
-    if (response.ok) {
-      response.json().then(function (data) {
-        displayRepos(data, user);
-      });
-    } else {
-      alert("Error: GitHub User Not Found");
-    }
-  })
-  .catch(function(error) {
-//Notice this `.catch()` getting chained onto the end of the `.then()` method
-alert("Unable to connect to GitHub");
-  });
+  fetch(apiUrl)
+    .then(function (response) {
+      //Request was successful
+      if (response.ok) {
+        response.json().then(function (data) {
+          displayRepos(data, user);
+        });
+      } else {
+        alert("Error: GitHub User Not Found");
+      }
+    })
+    .catch(function (error) {
+      //Notice this `.catch()` getting chained onto the end of the `.then()` method
+      alert("Unable to connect to GitHub");
+    });
 };
 
 //Receive input from form
@@ -62,7 +64,7 @@ var displayRepos = function (repos, searchTerm) {
     var repoEl = document.createElement("a");
     repoEl.classList = "list-item flex-row justify-space-between align-center";
     repoEl.setAttribute("href", "./single-repo.html?repo=" + repoName);
-    repoEl.setAttribute("target", "_blank")
+    repoEl.setAttribute("target", "_blank");
 
     //Create a span element to hold repository name
     var titleEl = document.createElement("span");
@@ -93,5 +95,39 @@ var displayRepos = function (repos, searchTerm) {
   }
 
   console.log(repos);
-  console.log(searchTerm);
 };
+
+var getFeaturedRepos = function(language) {
+  var apiUrl =
+    "https://api.github.com/search/repositories?q=" +
+    language +
+    "+is:featured&sort=help-wanted-issues";
+
+    fetch(apiUrl).then(function(response){
+      console.log(response);
+      if (response.ok){
+        response.json().then(function(data){
+
+          displayRepos(data.items, language);
+          console.log(data.items);
+        });
+
+      } else {
+        alert('Error: GitHub User Not Found')
+      }
+    });
+};
+
+var buttonClickHandler = function(event) {
+var language = event.target.getAttribute("data-language");
+console.log(language);
+if (language) {
+  getFeaturedRepos(language);
+}
+//Clear old content
+repoContainerEl.textContent = "";
+
+
+}
+
+languageButtonsEl.addEventListener('click', buttonClickHandler)
